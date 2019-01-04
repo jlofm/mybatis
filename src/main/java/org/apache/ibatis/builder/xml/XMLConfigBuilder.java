@@ -15,12 +15,6 @@
  */
 package org.apache.ibatis.builder.xml;
 
-import java.io.InputStream;
-import java.io.Reader;
-import java.util.Properties;
-
-import javax.sql.DataSource;
-
 import org.apache.ibatis.builder.BaseBuilder;
 import org.apache.ibatis.builder.BuilderException;
 import org.apache.ibatis.datasource.DataSourceFactory;
@@ -42,6 +36,11 @@ import org.apache.ibatis.session.LocalCacheScope;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.type.JdbcType;
 
+import javax.sql.DataSource;
+import java.io.InputStream;
+import java.io.Reader;
+import java.util.Properties;
+
 /**
  * @author Clinton Begin
  */
@@ -54,6 +53,7 @@ public class XMLConfigBuilder extends BaseBuilder {
   //是否已解析，XPath解析器,环境
   private boolean parsed;
   private XPathParser parser;
+  // 指定的数据源
   private String environment;
 
   //以下3个一组
@@ -65,7 +65,12 @@ public class XMLConfigBuilder extends BaseBuilder {
     this(reader, environment, null);
   }
 
-  //构造函数，转换成XPathParser再去调用构造函数
+  /**
+   * 构造函数，转换成XPathParser再去调用构造函数
+   * @param reader
+   * @param environment
+   * @param props
+   */
   public XMLConfigBuilder(Reader reader, String environment, Properties props) {
     //构造一个需要验证，XMLMapperEntityResolver的XPathParser
     this(new XPathParser(reader, true, props, new XMLMapperEntityResolver()), environment, props);
@@ -373,11 +378,20 @@ public class XMLConfigBuilder extends BaseBuilder {
 //	    </dataSource>
 //	  </environment>
 //	</environments>
+
+  /**
+   * 创建environment时，如果指定了特定的环境（即数据源），则返回指定环境的
+   * Environment对象，否则返回默认的Environment对象，这种方式实现了MyBatis
+   * 可以连接多数据源
+   * @param context
+   * @throws Exception
+   */
   private void environmentsElement(XNode context) throws Exception {
     if (context != null) {
       if (environment == null) {
         environment = context.getStringAttribute("default");
       }
+      // 遍历environment元素
       for (XNode child : context.getChildren()) {
         String id = child.getStringAttribute("id");
 		//循环比较id是否就是指定的environment
@@ -387,6 +401,9 @@ public class XMLConfigBuilder extends BaseBuilder {
           //7.2数据源
           DataSourceFactory dsFactory = dataSourceElement(child.evalNode("dataSource"));
           DataSource dataSource = dsFactory.getDataSource();
+          /**
+           * 建造模式的应用
+           */
           Environment.Builder environmentBuilder = new Environment.Builder(id)
               .transactionFactory(txFactory)
               .dataSource(dataSource);

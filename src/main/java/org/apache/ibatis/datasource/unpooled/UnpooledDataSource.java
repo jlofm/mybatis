@@ -15,21 +15,16 @@
  */
 package org.apache.ibatis.datasource.unpooled;
 
+import org.apache.ibatis.io.Resources;
+
+import javax.sql.DataSource;
 import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.Driver;
-import java.sql.DriverManager;
-import java.sql.DriverPropertyInfo;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
-
-import javax.sql.DataSource;
-
-import org.apache.ibatis.io.Resources;
 
 /**
  * @author Clinton Begin
@@ -208,7 +203,7 @@ public class UnpooledDataSource implements DataSource {
     configureConnection(connection);
     return connection;
   }
-
+  // 初始化驱动
   private synchronized void initializeDriver() throws SQLException {
 	  //这里便是大家熟悉的初学JDBC时的那几句话了 Class.forName newInstance()
     if (!registeredDrivers.containsKey(driver)) {

@@ -15,16 +15,16 @@
  */
 package org.apache.ibatis.builder.xml;
 
+import org.apache.ibatis.io.Resources;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-
-import org.apache.ibatis.io.Resources;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 /**
  * Offline entity resolver for the MyBatis DTDs
@@ -83,7 +83,7 @@ public class XMLMapperEntityResolver implements EntityResolver {
    * 
    * @throws org.xml.sax.SAXException If anything goes wrong
    */
-  @Override
+//  @Override
   //核心就是覆盖这个方法，达到转public DTD到本地DTD的目的
   public InputSource resolveEntity(String publicId, String systemId) throws SAXException {
 

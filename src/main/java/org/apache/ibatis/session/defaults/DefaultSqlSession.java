@@ -15,13 +15,6 @@
  */
 package org.apache.ibatis.session.defaults;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.ibatis.binding.BindingException;
 import org.apache.ibatis.exceptions.ExceptionFactory;
 import org.apache.ibatis.exceptions.TooManyResultsException;
@@ -36,9 +29,13 @@ import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.session.SqlSession;
 
-/**
- * @author Clinton Begin
- */
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * 默认SqlSession实现
  *
@@ -46,6 +43,14 @@ import org.apache.ibatis.session.SqlSession;
 public class DefaultSqlSession implements SqlSession {
 
   private Configuration configuration;
+  /**
+   * 执行器
+   * 在开启数据库会话时，会创建一个SqlSession对象，SqlSession对象中会有一个新的Executor对象，
+   * Executor对象中持有一个PerpetualCache，在会话结束时，会释放掉PerpetualCacge对象；
+   * 调用close方法时，会释放掉一级缓存；
+   * 如果SqlSession调用了clearCache()方法，会清空PerpetualCache对象中的数据，但该对象仍可以使用
+   * 如果SqlSession执行了update操作（update insert delete），都会将SqlSession对象中对应的一级缓存清空
+   */
   private Executor executor;
 
   /**
@@ -276,6 +281,12 @@ public class DefaultSqlSession implements SqlSession {
     return configuration;
   }
 
+  /**
+   * 将配置文件中的每一个节点抽象为一个Mapper接口
+   * @param type Mapper interface class
+   * @param <T>
+   * @return
+   */
   @Override
   public <T> T getMapper(Class<T> type) {
     //最后会去调用MapperRegistry.getMapper

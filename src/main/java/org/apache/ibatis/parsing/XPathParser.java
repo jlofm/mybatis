@@ -15,12 +15,11 @@
  */
 package org.apache.ibatis.parsing;
 
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import org.apache.ibatis.builder.BuilderException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.*;
 
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
@@ -28,23 +27,19 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
-
-import org.apache.ibatis.builder.BuilderException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.ErrorHandler;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * @author Clinton Begin
  */
 /**
  * XPath解析器，用的都是JDK的类包,封装了一下，使得使用起来更方便
- *
+ * xml的dom解析方式
  */
 public class XPathParser {
 
@@ -218,7 +213,7 @@ public class XPathParser {
     }
     return xnodes;
   }
-
+  // 解析对应的元素节点
   public XNode evalNode(String expression) {
     return evalNode(document, expression);
   }
@@ -229,6 +224,7 @@ public class XPathParser {
     if (node == null) {
       return null;
     }
+    //将解析得到的Node节点构造成自定义的XNode对象返回
     return new XNode(this, node, variables);
   }
 
@@ -246,6 +242,7 @@ public class XPathParser {
     try {
 		//这个是DOM解析方式
       DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+      // 验证
       factory.setValidating(validation);
 
 		//名称空间
@@ -264,17 +261,17 @@ public class XPathParser {
 		//将DTD放在org\apache\ibatis\builder\xml\mybatis-3-config.dtd,来达到验证xml合法性的目的
       builder.setEntityResolver(entityResolver);
       builder.setErrorHandler(new ErrorHandler() {
-        @Override
+//        @Override
         public void error(SAXParseException exception) throws SAXException {
           throw exception;
         }
 
-        @Override
+//        @Override
         public void fatalError(SAXParseException exception) throws SAXException {
           throw exception;
         }
 
-        @Override
+//        @Override
         public void warning(SAXParseException exception) throws SAXException {
         }
       });

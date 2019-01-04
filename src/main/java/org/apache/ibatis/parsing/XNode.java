@@ -15,23 +15,21 @@
  */
 package org.apache.ibatis.parsing;
 
+import org.w3c.dom.CharacterData;
+import org.w3c.dom.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-
-import org.w3c.dom.CharacterData;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * @author Clinton Begin
  */
 /**
  * 对org.w3c.dom.Node的包装
- *
+ * 构造自身程序使用的XNode节点，使用组合的方式，
+ * 包含Node XPathParser对象
  */
 public class XNode {
 

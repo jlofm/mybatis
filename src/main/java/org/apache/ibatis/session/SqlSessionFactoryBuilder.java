@@ -15,20 +15,21 @@
  */
 package org.apache.ibatis.session;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.util.Properties;
-
 import org.apache.ibatis.builder.xml.XMLConfigBuilder;
 import org.apache.ibatis.exceptions.ExceptionFactory;
 import org.apache.ibatis.executor.ErrorContext;
 import org.apache.ibatis.session.defaults.DefaultSqlSessionFactory;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.util.Properties;
+
 /*
  * Builds {@link SqlSession} instances.
- * 构建SqlSessionFactory的工厂.工厂模式
- *
+ * 构建SqlSessionFactory的工厂.
+ * 构建SqlSessionFactory时使用Builder模式
+ * 提供不同参数的build方法
  */
 /**
  * @author Clinton Begin
@@ -53,11 +54,12 @@ public class SqlSessionFactoryBuilder {
 
   //第4种方法是最常用的，它使用了一个参照了XML文档或更特定的SqlMapConfig.xml文件的Reader实例。
   //可选的参数是environment和properties。Environment决定加载哪种环境(开发环境/生产环境)，包括数据源和事务管理器。
-  //如果使用properties，那么就会加载那些properties（属性配置文件），那些属性可以用${propName}语法形式多次用在配置文件中。和Spring很像，一个思想？
+  //如果使用properties，那么就会加载那些properties（属性配置文件），那些属性可以用${propName}语法形式多次用在配置//文件中。和Spring很像，一个思想？
   public SqlSessionFactory build(Reader reader, String environment, Properties properties) {
     try {
         //委托XMLConfigBuilder来解析xml文件，并构建
       XMLConfigBuilder parser = new XMLConfigBuilder(reader, environment, properties);
+
       return build(parser.parse());
     } catch (Exception e) {
         //这里是捕获异常，包装成自己的异常并抛出的idiom？，最后还要reset ErrorContext
@@ -101,8 +103,13 @@ public class SqlSessionFactoryBuilder {
       }
     }
   }
-    
-  //最后一个build方法使用了一个Configuration作为参数,并返回DefaultSqlSessionFactory
+
+  /**
+   * 最后一个build方法使用了一个Configuration作为参数,并返回DefaultSqlSessionFactory
+   * 使用xml配置文件的方式，会把配置文件信息解析成Configuration对象，然后调用此方法
+   * @param config
+   * @return
+   */
   public SqlSessionFactory build(Configuration config) {
     return new DefaultSqlSessionFactory(config);
   }

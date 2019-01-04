@@ -15,9 +15,9 @@
  */
 package org.apache.ibatis.mapping;
 
-import javax.sql.DataSource;
-
 import org.apache.ibatis.transaction.TransactionFactory;
+
+import javax.sql.DataSource;
 
 /**
  * @author Clinton Begin
@@ -27,7 +27,7 @@ import org.apache.ibatis.transaction.TransactionFactory;
  * 决定加载哪种环境(开发环境/生产环境)
  */
 public final class Environment {
-  //环境id
+  //环境id final类型，对外提供get方法，值设置通过Builder模式设置
   private final String id;
   //事务工厂
   private final TransactionFactory transactionFactory;

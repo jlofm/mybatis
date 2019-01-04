@@ -15,19 +15,15 @@
  */
 package org.apache.ibatis.datasource.pooled;
 
+import org.apache.ibatis.reflection.ExceptionUtil;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.SQLException;
-
-import org.apache.ibatis.reflection.ExceptionUtil;
-
 /**
- * @author Clinton Begin
- */
-/**
- * 池化的连接
+ * 池化的连接 实现jdk的动态代理
  */
 class PooledConnection implements InvocationHandler {
 
@@ -35,6 +31,7 @@ class PooledConnection implements InvocationHandler {
   private static final Class<?>[] IFACES = new Class<?>[] { Connection.class };
 
   private int hashCode = 0;
+  // 创建的DataSource引用
   private PooledDataSource dataSource;
   //真正的连接
   private Connection realConnection;

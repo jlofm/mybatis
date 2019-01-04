@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="zy.basic.CarMapper">
+	<!-- 开启本mapper的namespace下的二级缓存-->
+	<cache></cache>
+
+	<!-- 一对一映射关系查找 association的使用 -->
+	<resultMap id="carResultMap" type="zy.basic.Car">
+		<id column="carid" property="id"></id>
+		<result column="cartype" property="type"></result>
+		<result column="brakestype" property="brakestype"></result>
+		<association property="engineId" resultMap="engineResultMap"></association>
+	</resultMap>
+
+	<resultMap id="engineResultMap" type="zy.basic.Engine">
+		<id column="id" property="id"></id>
+		<result property="type" column="type"></result>
+		<result property="name" column="name"></result>
+	</resultMap>
+
+	<!-- 一对多连接查询 detail中包含一对一映射item，根据查询需要，可以不包含item项的数据 -->
+	<resultMap id="carsResultMap" type="zy.basic.Car">
+		<id column="carid" property="id"></id>
+		<result column="cartype" property="type"></result>
+		<result column="brakestype" property="brakestype"></result>
+		<association property="engineId" resultMap="engineResultMap"></association>
+		<collection property="details" ofType="zy.basic.CarDetail">
+			<id property="id" column="id"/>
+			<result property="name" column="name"/>
+			<result property="mode" column="mode"/>
+			<result property="carId" column="carId"/>
+			<association property="item" javaType="zy.basic.Item">
+				<id property="id" column="id"/>
+				<result column="name" property="name"/>
+				<result column="code" property="code"/>
+				<result column="detail" property="detail"/>
+			</association>
+		</collection>
+	</resultMap>
+
+	<!--顾客与汽车配件没有直接关联，通过汽车及汽车明细与配件进行关联 -->
+	<resultMap id="customResultMap" type="zy.basic.Custom">
+		<id property="id" column="id"/>
+		<result property="name" column="name"/>
+		<result property="address" column="address"/>
+		<collection property="cars" ofType="zy.basic.Car">
+			<id column="carid" property="id"></id>
+			<result column="cartype" property="type"></result>
+			<result column="brakestype" property="brakestype"></result>
+			<association property="engineId" resultMap="engineResultMap"></association>
+			<collection property="details" ofType="zy.basic.CarDetail">
+				<id property="id" column="id"/>
+				<result property="name" column="name"/>
+				<result property="mode" column="mode"/>
+				<result property="carId" column="carId"/>
+				<association property="item" javaType="zy.basic.Item">
+					<id property="id" column="id"/>
+					<result column="name" property="name"/>
+					<result column="code" property="code"/>
+					<result column="detail" property="detail"/>
+				</association>
+			</collection>
+		</collection>
+	</resultMap>
+
+	<!--使用内连接查询所有数据 -->
+	<select id="getCars" resultMap="carResultMap">
+		SELECT engine.*,car.carid,car.cartype,car.brakestype from car,engine where car.engineId = engine.id
+	</select>
+
+	<!--使用内连接查询包含所有字段的数据  allCarDetailRP-->
+	<select id="getCarDetails" resultMap="carsResultMap">
+		SELECT car.carid,car.cartype,car.brakestype,car_detail.*,engine.id,engine.name,engine.type
+		from car,car_detail,engine,item where
+		car.carid = car_detail.carId and car.engineId = engine.id and car_detail.itemId = item.id
+	</select>
+
+	<select id="getCustom" resultMap="customResultMap">
+		SELECT custom.id,custom.name,custom.address,car.carid,car.cartype,car.brakestype
+		from custom,car,car_detail,engine,item
+		where custom.id = car.customId and car.carid = car_detail.carId
+		and car.engineId = engine.id and car_detail.itemId = item.id
+	</select>
+
+	<select id="getEngines" resultType="zy.basic.Engine">
+		SELECT * FROM engine
+	</select>
+
+
+
+
+
+
+
+
+
+
+
+</mapper>

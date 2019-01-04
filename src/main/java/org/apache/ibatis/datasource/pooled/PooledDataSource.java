@@ -15,22 +15,17 @@
  */
 package org.apache.ibatis.datasource.pooled;
 
-import java.io.PrintWriter;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Proxy;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Properties;
-import java.util.logging.Logger;
-
-import javax.sql.DataSource;
-
 import org.apache.ibatis.datasource.unpooled.UnpooledDataSource;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
+
+import javax.sql.DataSource;
+import java.io.PrintWriter;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Proxy;
+import java.sql.*;
+import java.util.Properties;
+import java.util.logging.Logger;
 
 /**
  * This is a simple, synchronous, thread-safe database connection pool.
@@ -419,6 +414,8 @@ public class PooledDataSource implements DataSource {
             long longestCheckoutTime = oldestActiveConnection.getCheckoutTime();
             if (longestCheckoutTime > poolMaximumCheckoutTime) {
             	//如果checkout时间过长，则这个connection标记为overdue（过期）
+              // 如果connection已经过期，从activeConnections中移除此对象，然后创建一个
+              // 新的PooledConnection对象，添加到activeConnections中，并返回此对象
               // Can claim overdue connection
               state.claimedOverdueConnectionCount++;
               state.accumulatedCheckoutTimeOfOverdueConnections += longestCheckoutTime;
